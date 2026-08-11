@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#070a14">
+<link rel="manifest" href="manifest.json">
+<title>System • Real-Life Leveling</title>
+<style>
+:root{--bg:#050812;--panel:#0b1020;--line:#20d9ff;--pink:#ff35d6;--text:#eef7ff;--muted:#8ea1b8;--good:#55ff9a;--bad:#ff5c7a;--gold:#ffd84a}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top,#111a35 0,#050812 45%,#02040a 100%);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,sans-serif;min-height:100vh}
+.app{max-width:760px;margin:auto;padding:16px 14px 90px}.hero{border:1px solid var(--line);padding:18px;border-radius:18px;background:linear-gradient(145deg,#0c1428cc,#070a14ee);box-shadow:0 0 25px #20d9ff22,0 0 35px #ff35d611}
+.kicker{font-size:12px;letter-spacing:3px;color:var(--line)}h1{margin:4px 0;font-size:30px;letter-spacing:1px}.subtitle{color:var(--muted);font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px}.card{background:#090f1ddd;border:1px solid #21304a;border-radius:14px;padding:13px}.stat{font-size:24px;font-weight:800}.label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}.bar{height:8px;background:#182235;border-radius:99px;overflow:hidden;margin-top:7px}.fill{height:100%;background:linear-gradient(90deg,var(--line),var(--pink));width:0%}
+.section{margin-top:16px}.section h2{font-size:15px;letter-spacing:1px;color:var(--line);margin:0 0 9px}.quest{display:flex;gap:10px;align-items:center;padding:12px;border:1px solid #1d2a42;background:#080d19;border-radius:12px;margin:8px 0}.quest .info{flex:1}.qname{font-weight:650;font-size:14px}.meta{font-size:11px;color:var(--muted);margin-top:3px}.xp{font-weight:800;white-space:nowrap}.done{border-color:#246b4b;background:#07150f}.done .qname{text-decoration:line-through;color:#9bb8a8}.failed{border-color:#713148;background:#180811}.failed .qname{text-decoration:line-through;color:#bd8f9a}
+button{border:1px solid #30445f;background:#0e1729;color:var(--text);border-radius:10px;padding:9px 11px;font-weight:700;cursor:pointer}button.primary{border-color:var(--line);box-shadow:0 0 12px #20d9ff22}button.danger{border-color:var(--bad);color:#ffb6c3}.small{padding:7px 9px;font-size:12px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.pill{padding:6px 9px;border:1px solid #30445f;border-radius:99px;font-size:11px;color:var(--muted)}.sunday{border-color:var(--gold);color:var(--gold);background:#171305}.saturday{border-color:#a56cff;color:#d6bcff;background:#130d22}
+nav{position:fixed;bottom:0;left:0;right:0;background:#060914ee;backdrop-filter:blur(14px);border-top:1px solid #20304a;display:flex;justify-content:center;gap:6px;padding:10px;z-index:5}nav button{flex:1;max-width:180px}
+.hidden{display:none!important}.modal{position:fixed;inset:0;background:#0009;display:flex;align-items:flex-end;justify-content:center;z-index:10}.sheet{width:min(760px,100%);background:#080d19;border:1px solid #30445f;border-radius:20px 20px 0 0;padding:18px;max-height:80vh;overflow:auto}
+input,select{width:100%;padding:11px;border-radius:10px;border:1px solid #30445f;background:#0b1220;color:white;margin:6px 0}
+.notice{padding:12px;border:1px dashed #38516f;border-radius:12px;color:#b8c7d9;font-size:12px;line-height:1.5}
+footer{text-align:center;color:#62738a;font-size:11px;margin-top:18px}
+
+.classbox{border:1px solid #8d5cff;background:linear-gradient(145deg,#130d25,#080d19);box-shadow:0 0 18px #8d5cff22}
+.classname{font-size:22px;font-weight:900;color:#d8c2ff}.classmeta{font-size:11px;color:#a9b6c8;margin-top:4px}
+.unlock{border-color:var(--gold)!important;color:var(--gold)!important}
+.choice{padding:12px;border:1px solid #30445f;border-radius:12px;margin:8px 0;background:#0b1220}
+.choice h3{margin:0 0 4px}.choice p{margin:0;color:var(--muted);font-size:12px;line-height:1.45}
+
+.classscreen{background:radial-gradient(circle at 50% 0,#271451 0,#090d1a 45%,#050812 100%);border:1px solid #7e5cff;border-radius:18px;padding:15px;box-shadow:0 0 30px #7e5cff25,inset 0 0 30px #7e5cff0b}
+.class-header{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:12px}.class-rarity{font-size:10px;letter-spacing:2px;color:#ffd84a}.class-icon{font-size:40px;filter:drop-shadow(0 0 12px #8d5cff)}
+.game-card{position:relative;overflow:hidden;border:1px solid #3b4c6b;background:linear-gradient(145deg,#10182a,#070b14);border-radius:15px;padding:14px;margin:9px 0;transition:.18s;box-shadow:inset 0 0 18px #ffffff03}
+.game-card:hover{transform:translateY(-2px);border-color:#8d5cff;box-shadow:0 0 20px #8d5cff18}
+.game-card.locked{opacity:.62;filter:saturate(.5)}.game-card.selected{border-color:#55ff9a;box-shadow:0 0 20px #55ff9a18}
+.game-title{font-size:17px;font-weight:900}.game-desc{font-size:11px;color:#9fb0c5;line-height:1.5;margin:5px 0}.skilltag{display:inline-block;padding:4px 7px;border:1px solid #30445f;border-radius:8px;font-size:10px;margin:3px 3px 0 0;color:#c9d6e7}
+.power{display:flex;justify-content:space-between;font-size:11px;color:#aebdd0;margin-top:7px}.power b{color:#55ff9a}
+.awaken{width:100%;margin-top:10px;border-color:#ffd84a;color:#ffe989;background:linear-gradient(90deg,#211804,#0f0d08);box-shadow:0 0 14px #ffd84a20}
+.awaken:hover{box-shadow:0 0 22px #ffd84a40}.choice-grid{display:grid;grid-template-columns:1fr;gap:8px}
+.level-lock{padding:10px;border:1px dashed #455675;border-radius:10px;color:#aebdd0;font-size:11px;text-align:center}
+.system-msg{padding:10px;border-left:3px solid #20d9ff;background:#081321;color:#b9d8e8;font-size:11px;line-height:1.5}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="hero">
+<div class="kicker">⚔ SYSTEM ONLINE</div>
+<h1>REAL-LIFE LEVELING</h1>
+<div class="subtitle">Civil Engineering Student • Daily Routine RPG</div>
+<div id="dayBadge" class="pill" style="display:inline-block;margin-top:10px"></div>
+<div class="grid">
+<div class="card"><div class="label">Rank</div><div class="stat" id="rank">E</div></div>
+<div class="card"><div class="label">Level</div><div class="stat" id="level">1</div></div>
+<div class="card"><div class="label">Spendable XP</div><div class="stat" id="xp">0</div></div>
+<div class="card"><div class="label">Stat Points</div><div class="stat" id="sp">0</div></div>
+</div>
+<div style="margin-top:12px" class="label">LEVEL PROGRESS <span id="levelText"></span></div>
+<div class="bar"><div id="levelBar" class="fill"></div></div>
+<div class="row" style="margin-top:10px"><span class="pill">🔥 Streak <b id="streak">0</b></span><span class="pill">🏆 Best <b id="best">0</b></span><span class="pill">⭐ Total XP <b id="totalXp">0</b></span></div>
+<div class="card classbox" style="margin-top:12px">
+  <div class="label">⚔ CLASS SYSTEM</div>
+  <div class="classname" id="className">Student</div>
+  <div class="classmeta" id="subclassName">Subclass: Unchosen</div>
+  <div class="classmeta" id="classHint"></div>
+<div class="classmeta" id="classPassive"></div>
+  <div class="row" style="margin-top:9px"><button class="small unlock" onclick="classMenu()">⚔ Class / Subclass</button></div>
+</div>
+</header>
+
+<section class="section">
+<h2>📅 TODAY'S PLAN</h2>
+<div id="plan" class="notice"></div>
+</section>
+
+<section class="section">
+<h2>📜 DAILY QUEST BOARD</h2>
+<div id="sundayNotice" class="notice hidden"></div>
+<div id="quests"></div>
+</section>
+
+<section class="section">
+<h2>🎮 SYSTEM COMMANDS</h2>
+<div class="row">
+<button class="primary" onclick="openStats()">💎 Stats</button>
+<button onclick="skill()">🎯 Skill</button>
+<button onclick="bonus()">🏆 Bonus</button>
+<button onclick="recovery()">🌀 Recovery</button>
+<button onclick="boss()">👑 Boss</button>
+<button onclick="shop()">🏪 Shop</button>
+</div>
+</section>
+
+<section class="section">
+<h2>🏅 ACHIEVEMENTS & TITLES</h2>
+<div class="card"><div id="achievements" class="notice"></div></div>
+</section>
+
+<section class="section">
+<h2>⚙️ DAY CONTROL</h2>
+<div class="row">
+<button class="primary" onclick="lockDay()">🌙 Finish / Lock Day</button>
+<button class="danger" onclick="resetSystem()">Reset</button>
+</div>
+</section>
+<footer>Sunday = recovery exception • Saturday = no college, but study remains mandatory</footer>
+</div>
+<nav><button onclick="render()">🏠 System</button><button onclick="openStats()">📊 Stats</button><button onclick="help()">❓ Help</button></nav>
+<div id="modal" class="modal hidden" onclick="if(event.target.id==='modal')closeModal()"><div class="sheet" id="sheet"></div></div>
+
+<script>
+const ranks=[["E",0,"Awakened"],["D",1500,"Rookie Hunter"],["C",3500,"Skilled Hunter"],["B",7000,"Elite Hunter"],["A",12000,"Advanced Hunter"],["S",20000,"S-Rank Hunter"],["SS",35000,"Elite S-Rank"],["SSS",55000,"Monarch"]];
+const stats={INT:"Study & learning",STR:"Exercise",CHA:"Communication & English",DEX:"AutoCAD/Excel/skills",VIT:"Sleep/recovery",WIL:"Discipline"};
+const titles=[[3,"First Step"],[7,"Consistent Hunter"],[14,"Iron Will"],[30,"Discipline Hunter"],[60,"Elite Hunter"],[90,"A-Rank Mindset"],[180,"S-Rank Discipline"],[365,"The Monarch"]];
+const shopItems=[["Anime / entertainment 30 min",100],["Gaming / entertainment 30 min",150],["Movie night",300],["1 hour leisure reward",250],["Special reward",500]];
+const weekdayPlans=[
+"MON — Mathematics + AutoCAD",
+"TUE — Engineering Graphics + English",
+"WED — Physics / Chemistry + Excel",
+"THU — Engineering Mechanics + AutoCAD Practice",
+"FRI — Weekly Revision + Assignments",
+"SAT — 2–3 hrs Study + AutoCAD Practice + Exercise",
+"SUN — Weekly Revision + Plan Next Week + Light Exercise / Rest"
+];
+const weekdayQuests=[
+[
+["wake","6:30 AM — Wake up",5,"VIT"],["ready","6:30–7:15 — Stretch & get ready",5,"VIT"],["morning_study","7:15–8:15 — Morning study",15,"INT"],["breakfast","8:15–8:45 — Breakfast",2,"VIT"],["travel_college","8:45–9:15 — Travel to college",2,"VIT"],["college","9:15 AM–5:00 PM — Attend college/classes",20,"INT"],["travel_home","5:00–5:30 — Travel home + light snack",2,"VIT"],["exercise","5:30–6:30 — Exercise",15,"STR"],["bath","6:30–7:00 — Bath & relax",2,"VIT"],["dinner","7:00–7:30 — Dinner",2,"VIT"],["family_walk","7:30–8:00 — Family time / short walk",2,"CHA"],["evening_study","8:00–9:30 — Study + external skill",20,"INT"],["prepare","9:30–10:00 — Prepare for tomorrow",3,"WIL"],["sleep","10:00 PM — Sleep on time",5,"VIT"]
+],
+[
+["wake","6:30 AM — Wake up",5,"VIT"],["ready","6:30–7:15 — Stretch & get ready",5,"VIT"],["morning_study","7:15–8:15 — Morning study",15,"INT"],["breakfast","8:15–8:45 — Breakfast",2,"VIT"],["travel_college","8:45–9:15 — Travel to college",2,"VIT"],["college","9:15 AM–5:00 PM — Attend college/classes",20,"INT"],["travel_home","5:00–5:30 — Travel home + light snack",2,"VIT"],["exercise","5:30–6:30 — Exercise",15,"STR"],["bath","6:30–7:00 — Bath & relax",2,"VIT"],["dinner","7:00–7:30 — Dinner",2,"VIT"],["family_walk","7:30–8:00 — Family time / short walk",2,"CHA"],["evening_study","8:00–9:30 — Study + external skill",20,"INT"],["prepare","9:30–10:00 — Prepare for tomorrow",3,"WIL"],["sleep","10:00 PM — Sleep on time",5,"VIT"]
+],
+[
+["wake","6:30 AM — Wake up",5,"VIT"],["ready","6:30–7:15 — Stretch & get ready",5,"VIT"],["morning_study","7:15–8:15 — Morning study",15,"INT"],["breakfast","8:15–8:45 — Breakfast",2,"VIT"],["travel_college","8:45–9:15 — Travel to college",2,"VIT"],["college","9:15 AM–5:00 PM — Attend college/classes",20,"INT"],["travel_home","5:00–5:30 — Travel home + light snack",2,"VIT"],["exercise","5:30–6:30 — Exercise",15,"STR"],["bath","6:30–7:00 — Bath & relax",2,"VIT"],["dinner","7:00–7:30 — Dinner",2,"VIT"],["family_walk","7:30–8:00 — Family time / short walk",2,"CHA"],["evening_study","8:00–9:30 — Study + external skill",20,"INT"],["prepare","9:30–10:00 — Prepare for tomorrow",3,"WIL"],["sleep","10:00 PM — Sleep on time",5,"VIT"]
+],
+[
+["wake","6:30 AM — Wake up",5,"VIT"],["ready","6:30–7:15 — Stretch & get ready",5,"VIT"],["morning_study","7:15–8:15 — Morning study",15,"INT"],["breakfast","8:15–8:45 — Breakfast",2,"VIT"],["travel_college","8:45–9:15 — Travel to college",2,"VIT"],["college","9:15 AM–5:00 PM — Attend college/classes",20,"INT"],["travel_home","5:00–5:30 — Travel home + light snack",2,"VIT"],["exercise","5:30–6:30 — Exercise",15,"STR"],["bath","6:30–7:00 — Bath & relax",2,"VIT"],["dinner","7:00–7:30 — Dinner",2,"VIT"],["family_walk","7:30–8:00 — Family time / short walk",2,"CHA"],["evening_study","8:00–9:30 — Study + external skill",20,"INT"],["prepare","9:30–10:00 — Prepare for tomorrow",3,"WIL"],["sleep","10:00 PM — Sleep on time",5,"VIT"]
+],
+[
+["wake","6:30 AM — Wake up",5,"VIT"],["ready","6:30–7:15 — Stretch & get ready",5,"VIT"],["morning_study","7:15–8:15 — Morning study",15,"INT"],["breakfast","8:15–8:45 — Breakfast",2,"VIT"],["travel_college","8:45–9:15 — Travel to college",2,"VIT"],["college","9:15 AM–5:00 PM — Attend college/classes",20,"INT"],["travel_home","5:00–5:30 — Travel home + light snack",2,"VIT"],["exercise","5:30–6:30 — Exercise",15,"STR"],["bath","6:30–7:00 — Bath & relax",2,"VIT"],["dinner","7:00–7:30 — Dinner",2,"VIT"],["family_walk","7:30–8:00 — Family time / short walk",2,"CHA"],["evening_study","8:00–9:30 — Study + external skill",20,"INT"],["prepare","9:30–10:00 — Prepare for tomorrow",3,"WIL"],["sleep","10:00 PM — Sleep on time",5,"VIT"]
+],
+[
+["wake","7:00 AM — Wake up",5,"VIT"],["ready","7:00–7:45 — Stretch & get ready",5,"VIT"],["morning_study","8:00–10:00 — Main study block",25,"INT"],["breakfast","10:00–10:30 — Breakfast",2,"VIT"],["study2","10:30–11:30 — AutoCAD / external skill",15,"DEX"],["lunch","1:00–1:30 — Lunch",2,"VIT"],["study3","2:00–3:00 — Revision / assignments",15,"INT"],["exercise","5:30–6:30 — Exercise",15,"STR"],["family_walk","7:30–8:00 — Family time / short walk",2,"CHA"],["evening_study","8:00–9:30 — Light study / AutoCAD",14,"DEX"],["prepare","9:30–10:00 — Prepare for tomorrow",3,"WIL"],["sleep","10:00 PM — Sleep on time",5,"VIT"]
+],
+[
+["weekly_revision","Weekly revision",20,"INT"],["plan","Plan next week",10,"WIL"],["light_exercise","Light exercise / walk",10,"STR"],["family","Family / recovery time",5,"VIT"]
+]
+];
+function fresh(){return {level:1,xp:0,totalXp:0,sp:0,classId:null,subclassId:null,classHistory:[],stats:{INT:1,STR:1,CHA:1,DEX:1,VIT:1,WIL:1},streak:0,best:0,last:null,achievements:[],titles:[],history:{},boss:{},shopSpent:0}}
+let p=JSON.parse(localStorage.getItem("soloLevelingPhone")||"null")||fresh();
+function key(){return new Date().toISOString().slice(0,10)}
+function dow(){return new Date().getDay()}
+function sunday(){return dow()===0}
+function quests(){return weekdayQuests[dow()===0?6:dow()-1]}
+function d(){let k=key(); if(!p.history[k])p.history[k]={q:{},earned:0,lost:0,bonus:0,recovery:0,skill:null,locked:false};return p.history[k]}
+function save(){localStorage.setItem("soloLevelingPhone",JSON.stringify(p))}
+function rank(){let r=ranks[0];for(const x of ranks)if(p.totalXp>=x[1])r=x;return r}
+function nextRank(){return ranks.find(x=>p.totalXp<x[1])}
+function lvl(){return Math.floor(p.totalXp/500)+1}
+function gain(n,reason){let old=lvl();p.totalXp+=n;p.xp+=n;let nu=lvl();if(nu>old){p.sp+=(nu-old)*5;alert("⚡ LEVEL UP!\\nLevel "+old+" → "+nu+"\\n+"+((nu-old)*5)+" SP")};console.log(reason)}
+function lose(n,reason){let a=Math.min(n,p.xp);p.xp-=a;d().lost+=a}
+function streak(){let k=key();if(p.last===k)return;if(p.last){let prev=new Date(p.last),now=new Date(k);let diff=Math.round((now-prev)/86400000);p.streak=diff===1?p.streak+1:1}else p.streak=1;p.best=Math.max(p.best,p.streak);p.last=k}
+function achievements(){let checks=[["Awakening",p.totalXp>=100],["Level 5",lvl()>=5],["Level 10",lvl()>=10],["7-Day Streak",p.best>=7],["30-Day Streak",p.best>=30],["1000 XP",p.totalXp>=1000],["5000 XP",p.totalXp>=5000]];for(const [n,ok] of checks)if(ok&&!p.achievements.includes(n))p.achievements.push(n);for(const [days,t] of titles)if(p.best>=days&&!p.titles.includes(t))p.titles.push(t)}
+
+const classes=[
+ {id:"warrior",name:"Warrior",unlock:5,desc:"Build STR, VIT and WIL through training and consistency.",bonus:{STR:2,VIT:1},subs:[
+  {id:"berserker",name:"Berserker",unlock:10,desc:"High-intensity training and relentless discipline.",bonus:{STR:2,WIL:1}},
+  {id:"guardian",name:"Guardian",unlock:10,desc:"Recovery, resilience and steady physical progress.",bonus:{VIT:2,WIL:1}}
+ ]},
+ {id:"scholar",name:"Scholar",unlock:5,desc:"Master INT, revision and academic consistency.",bonus:{INT:2,DEX:1},subs:[
+  {id:"strategist",name:"Strategist",unlock:10,desc:"Planning, analysis and problem solving.",bonus:{INT:2,DEX:1}},
+  {id:"researcher",name:"Researcher",unlock:10,desc:"Deep study and long-term knowledge building.",bonus:{INT:3}}
+ ]},
+ {id:"engineer",name:"Engineer",unlock:5,desc:"Balance academics with practical engineering skills.",bonus:{INT:1,DEX:2},subs:[
+  {id:"structural",name:"Structural Specialist",unlock:10,desc:"Focus: structural engineering, mechanics and design.",bonus:{INT:1,DEX:2,STR:1}},
+  {id:"construction",name:"Construction Specialist",unlock:10,desc:"Focus: construction management, planning and execution.",bonus:{DEX:2,WIL:1}},
+  {id:"geotech",name:"Geotechnical Specialist",unlock:10,desc:"Focus: soil, foundations and geotechnical problem solving.",bonus:{INT:2,DEX:1}},
+  {id:"transport",name:"Transportation Specialist",unlock:10,desc:"Focus: roads, traffic and transportation systems.",bonus:{INT:1,DEX:2}},
+  {id:"environmental",name:"Environmental Specialist",unlock:10,desc:"Focus: sustainable and environmental engineering.",bonus:{INT:2,VIT:1}},
+  {id:"water",name:"Water Resources Specialist",unlock:10,desc:"Focus: hydraulics, hydrology and water systems.",bonus:{INT:2,DEX:1}}
+ ]},
+ {id:"ranger",name:"Ranger",unlock:5,desc:"Develop DEX, CHA and adaptable real-world skills.",bonus:{DEX:2,CHA:1},subs:[
+  {id:"scout",name:"Scout",unlock:10,desc:"Fast learning, communication and adaptability.",bonus:{DEX:2,CHA:1}},
+  {id:"commander",name:"Commander",unlock:10,desc:"Leadership, communication and discipline.",bonus:{CHA:2,WIL:1}}
+ ]}
+];
+
+function ensureClassState(){
+ if(!p.classId)p.classId=null;
+ if(!p.subclassId)p.subclassId=null;
+ if(!p.classHistory)p.classHistory=[];
+}
+function classMenu(){
+ ensureClassState();
+ let lv=lvl();
+ const icon={warrior:"⚔️",scholar:"📚",engineer:"🏗️",ranger:"🏹"};
+ const rarity={warrior:"RARE CLASS",scholar:"RARE CLASS",engineer:"EPIC CLASS",ranger:"RARE CLASS"};
+ let body=`<div class="classscreen">
+ <div class="class-header"><div><div class="class-rarity">SYSTEM • CLASS AWAKENING</div><h2 style="margin:3px 0">⚔ CLASS GATE</h2><div class="meta">Level ${lv} • Choose your path</div></div><div class="class-icon">✨</div></div>
+ <div class="system-msg">Your actions shape your build. Class bonuses permanently modify your stats. Subclasses unlock at Level 10.</div>
+ <h3 style="margin:16px 0 8px">AVAILABLE CLASSES</h3><div class="choice-grid">`;
+
+ if(lv<5){
+   body+=`<div class="level-lock">🔒 CLASS GATE LOCKED<br><b>Reach Level 5</b> to awaken a class.<br>Current Level: ${lv}</div>`;
+ } else if(!p.classId){
+   classes.forEach(c=>{
+     let bonus=Object.entries(c.bonus).map(([k,v])=>`+${v} ${k}`).join(" • ");
+     body+=`<div class="game-card"><div class="class-header"><div><div class="class-rarity">${rarity[c.id]}</div><div class="game-title">${icon[c.id]} ${c.name}</div></div><div class="pill">Lv. 5</div></div>
+     <div class="game-desc">${c.desc}</div><div>${Object.keys(c.bonus).map(s=>`<span class="skilltag">📈 ${s} +${c.bonus[s]}</span>`).join("")}</div>
+     <div class="power">AWAKENING BONUS <b>${bonus}</b></div>
+     <button class="awaken" onclick="chooseClass('${c.id}')">⚡ AWAKEN CLASS</button></div>`;
+   });
+ } else {
+   let c=classes.find(x=>x.id===p.classId);
+   body+=`<div class="game-card selected"><div class="class-header"><div><div class="class-rarity">AWAKENED • ${rarity[c.id]}</div><div class="game-title">${icon[c.id]} ${c.name}</div></div><div class="pill">ACTIVE</div></div>
+   <div class="game-desc">${c.desc}</div><div class="power">CLASS POWER <b>${Object.entries(c.bonus).map(([k,v])=>k+" +"+v).join(" • ")}</b></div></div>`;
+ }
+ body+=`</div>`;
+
+ if(p.classId){
+   let c=classes.find(x=>x.id===p.classId);
+   body+=`<h3 style="margin:18px 0 8px">🧬 SUBCLASS TREE</h3>`;
+   if(lv<10){
+     body+=`<div class="level-lock">🔒 SUBCLASS GATE LOCKED<br><b>Reach Level 10</b> to specialize.<br>Current Level: ${lv}</div>`;
+   } else if(!p.subclassId){
+     body+=`<div class="system-msg">⚡ SUBCLASS AWAKENING AVAILABLE — Choose one specialization.</div>`;
+     c.subs.forEach(s=>{
+       body+=`<div class="game-card"><div class="class-header"><div><div class="class-rarity">SUBCLASS • LEVEL 10</div><div class="game-title">🧬 ${s.name}</div></div><div class="pill">PATH</div></div>
+       <div class="game-desc">${s.desc}</div><div>${Object.entries(s.bonus).map(([k,v])=>`<span class="skilltag">🔥 ${k} +${v}</span>`).join("")}</div>
+       <button class="awaken" onclick="chooseSubclass('${s.id}')">🧬 AWAKEN SUBCLASS</button></div>`;
+     });
+   } else {
+     let s=c.subs.find(x=>x.id===p.subclassId);
+     body+=`<div class="game-card selected"><div class="class-header"><div><div class="class-rarity">SUBCLASS AWAKENED</div><div class="game-title">🧬 ${s.name}</div></div><div class="pill">ACTIVE</div></div>
+     <div class="game-desc">${s.desc}</div><div>${Object.entries(s.bonus).map(([k,v])=>`<span class="skilltag">🔥 ${k} +${v}</span>`).join("")}</div></div>`;
+   }
+ }
+ body+=`<div class="system-msg" style="margin-top:12px">⚠️ CLASS / SUBCLASS CHOICE IS PERMANENT FOR THIS SAVE.</div></div>`;
+ openModal(body);
+}
+function applyBonus(b){
+ for(const [s,v] of Object.entries(b)){if(p.stats[s]!==undefined)p.stats[s]+=v}
+}
+function chooseClass(id){
+ ensureClassState();
+ if(lvl()<5)return alert("Reach Level 5 first.");
+ if(p.classId)return alert("Class already selected.");
+ let c=classes.find(x=>x.id===id);if(!c)return;
+ p.classId=id;applyBonus(c.bonus);p.classHistory.push({type:"class",id,level:lvl()});
+ save();alert(`⚔ CLASS AWAKENED!\\n${c.name}\\n\\nYour class bonuses have been applied.`);
+ classMenu();render();
+}
+function chooseSubclass(id){
+ ensureClassState();
+ if(lvl()<10)return alert("Reach Level 10 first.");
+ if(!p.classId||p.subclassId)return alert("Subclass cannot be changed.");
+ let c=classes.find(x=>x.id===p.classId),s=c?.subs.find(x=>x.id===id);if(!s)return;
+ p.subclassId=id;applyBonus(s.bonus);p.classHistory.push({type:"subclass",id,level:lvl()});
+ save();alert(`🧬 SUBCLASS AWAKENED!\\n${s.name}\\n\\nSpecialization bonuses applied.`);
+ classMenu();render();
+}
+function render(){ensureClassState();let r=rank(),nr=nextRank(),lv=lvl(),cur=p.totalXp%500;document.getElementById("rank").textContent=r[0]+" • "+r[2];
+let cls=p.classId?(classes.find(c=>c.id===p.classId)||null):null;
+let sub=cls&&p.subclassId?cls.subs.find(s=>s.id===p.subclassId):null;
+document.getElementById("className").textContent=cls?cls.name:"Student";
+document.getElementById("subclassName").textContent="Subclass: "+(sub?sub.name:"Unchosen");
+document.getElementById("classHint").textContent=lv<5?"Class unlocks at Level 5":!sub&&lv<10?"Subclass unlocks at Level 10":sub?"Specialization active":"Choose your class";
+document.getElementById("classPassive").textContent=cls?
+("Passive: "+(cls.id==="warrior"?"Training grants stronger STR/VIT growth":cls.id==="scholar"?"Study quests strengthen INT/DEX":cls.id==="engineer"?"Engineering skills strengthen INT/DEX": "Communication and skills strengthen CHA/DEX")):
+"Passive unlocks when your class awakens";
+document.getElementById("level").textContent=lv;document.getElementById("xp").textContent=p.xp;document.getElementById("sp").textContent=p.sp;document.getElementById("totalXp").textContent=p.totalXp;document.getElementById("streak").textContent=p.streak;document.getElementById("best").textContent=p.best;document.getElementById("levelText").textContent=`${cur}/500`;document.getElementById("levelBar").style.width=(cur/5)+"%";document.getElementById("plan").textContent=weekdayPlans[dow()?dow()-1:6];let badge=document.getElementById("dayBadge");badge.className="pill "+(sunday()?"sunday":dow()===6?"saturday":"");badge.textContent=sunday()?"🌙 SUNDAY EXCEPTION":dow()===6?"🟣 SATURDAY • NO CLASS • STUDY DAY":"⚡ "+new Date().toLocaleDateString(undefined,{weekday:"long",day:"numeric",month:"short"});let qbox=document.getElementById("quests"), notice=document.getElementById("sundayNotice");qbox.innerHTML="";if(sunday()){notice.classList.remove("hidden");notice.textContent="Sunday is a protected recovery day. Daily penalties are OFF. Use it for weekly revision, planning, light exercise and rest."}else{notice.classList.add("hidden");for(const q of quests()){let [id,name,xp,st]=q,status=d().q[id]||"pending",pen=Math.max(1,Math.ceil(xp/2));let el=document.createElement("div");el.className="quest "+status;el.innerHTML=`<div class="info"><div class="qname">${status==="done"?"✅":status==="failed"?"❌":"⬜"} ${name}</div><div class="meta">${st} • complete +${xp} XP • fail −${pen} XP</div></div><div class="xp">${status==="done"?"+":status==="failed"?"−":"±"}${status==="failed"?pen:xp}</div>`;if(status==="pending"){let b=document.createElement("button");b.className="small primary";b.textContent="DONE";b.onclick=()=>complete(id);let f=document.createElement("button");f.className="small danger";f.textContent="FAIL";f.onclick=()=>fail(id);el.append(b,f)}qbox.appendChild(el)}}document.getElementById("achievements").innerHTML=`<b>🏆</b> ${p.achievements.join(", ")||"None yet"}<br><br><b>👑</b> ${p.titles.join(", ")||"None yet"}`;save()}
+function complete(id){
+ if(sunday())return;let q=quests().find(x=>x[0]===id);if(!q||d().q[id])return;
+ d().q[id]="done";d().earned+=q[2];gain(q[2],q[1]);
+ let extra=0;
+ if(p.classId==="warrior" && (q[0]==="exercise"||q[0]==="light_exercise"))extra=3;
+ if(p.classId==="scholar" && (q[0].includes("study")||q[0]==="weekly_revision"))extra=3;
+ if(p.classId==="engineer" && (q[0].includes("study")||q[0].includes("skill")||q[0]==="study2"))extra=3;
+ if(p.classId==="ranger" && (q[0]==="family_walk"||q[0]==="skill"))extra=3;
+ if(p.subclassId && (q[0].includes("study")||q[0]==="exercise"||q[0]==="skill"))extra+=2;
+ if(extra){gain(extra,"Class Passive");d().earned+=extra}
+ streak();achievements();render()
+}
+function fail(id){if(sunday())return;let q=quests().find(x=>x[0]===id);if(!q||d().q[id])return;if(!confirm(`Fail "${q[1]}"?\\nYou will lose ${Math.max(1,Math.ceil(q[2]/2))} XP.`))return;d().q[id]="failed";lose(Math.max(1,Math.ceil(q[2]/2)),q[1]);render()}
+function bonus(){if(sunday()){alert("Sunday exception: no perfect-day bonus required.");return}let qs=quests();if(qs.every(q=>d().q[q[0]]==="done")&&!d().bonus){d().bonus=20;gain(20,"Perfect Day");achievements();render()}else alert("Complete every daily quest first.")}
+function recovery(){if(sunday()){alert("Sunday recovery is already active.");return}if(d().recovery){alert("Recovery quest already used today.");return}d().recovery=10;gain(10,"10-Minute Recovery");streak();render()}
+function skill(){let s=prompt("External skill:\\nEnglish\\nCommunication\\nAutoCAD\\nExcel\\nCoding\\nCivil Engineering\\nGATE Preparation");if(s){d().skill=s;render()}}
+function openStats(){let body="<h2>💎 STAT POINTS</h2><p>Available SP: <b>"+p.sp+"</b></p>";for(const [s,desc] of Object.entries(stats))body+=`<div class="quest"><div class="info"><b>${s}</b> — ${p.stats[s]}<div class="meta">${desc}</div></div><button onclick="addStat('${s}')">+1 SP</button></div>`;openModal(body)}
+function addStat(s){if(p.sp<1)return alert("No SP available.");p.sp--;p.stats[s]++;save();openStats();render()}
+function shop(){let body="<h2>🏪 SYSTEM SHOP</h2><p>Spendable XP: <b>"+p.xp+"</b></p>";shopItems.forEach((x,i)=>body+=`<div class="quest"><div class="info"><b>${x[0]}</b><div class="meta">${x[1]} XP</div></div><button onclick="buy(${i})">BUY</button></div>`);openModal(body)}
+function buy(i){let [name,cost]=shopItems[i];if(p.xp<cost)return alert("Not enough XP.");p.xp-=cost;p.shopSpent+=cost;save();alert("🎁 Reward unlocked: "+name);shop();render()}
+function boss(){let week=new Date();let monday=new Date(week);monday.setDate(week.getDate()-((week.getDay()+6)%7));let key=monday.toISOString().slice(0,10);if(p.boss[key])return alert("Boss already defeated this week.");let choice=prompt("WEEKLY BOSS\\n1 Knowledge — 5 study sessions\\n2 Strength — 4 workouts\\n3 Discipline — 5 preparation days\\n4 Skill — 5 skill sessions");let arr=Object.values(p.history);let count=0;if(choice==="1")count=arr.filter(h=>h.q?.morning_study==="done"||h.q?.evening_study==="done").length;if(choice==="2")count=arr.filter(h=>h.q?.exercise==="done").length;if(choice==="3")count=arr.filter(h=>h.q?.prepare==="done").length;if(choice==="4")count=arr.filter(h=>h.skill).length;let goal=choice==="2"?4:5;if(count>=goal){p.boss[key]=true;gain(100,"Weekly Boss");alert("👑 BOSS DEFEATED! +100 XP");achievements();render()}else alert(`Boss progress: ${count}/${goal}`)}
+function lockDay(){if(sunday()){alert("🌙 Sunday exception: no daily lock or penalties.");return}if(d().locked)return alert("Day already locked.");let pending=quests().filter(q=>!d().q[q[0]]);if(pending.length){let penalty=pending.reduce((a,q)=>a+Math.max(1,Math.ceil(q[2]/2)),0);if(!confirm(`${pending.length} unfinished tasks will fail.\\nTotal penalty: −${penalty} XP\\nLock day?`))return;pending.forEach(q=>{d().q[q[0]]="failed";lose(Math.max(1,Math.ceil(q[2]/2)),q[1])})}if(quests().every(q=>d().q[q[0]]==="done")&&!d().bonus){d().bonus=20;gain(20,"Perfect Day")}d().locked=true;streak();achievements();render();alert("🌙 DAY LOCKED")}
+function help(){openModal(`<h2>⚔ SYSTEM GUIDE</h2><div class="notice"><b>Complete:</b> earn the listed XP.<br><b>Fail:</b> lose 50% of that task's XP, rounded up.<br><b>Lock day:</b> unfinished tasks automatically fail.<br><b>Levels:</b> every 500 lifetime XP = +1 level and +5 SP.<br><b>Ranks:</b> E → D → C → B → A → S → SS → SSS.<br><b>Saturday:</b> no college, but study + AutoCAD/skill remain part of the routine.<br><b>Sunday:</b> no daily scoring or penalties; recovery/planning day.<br><br>Progress is saved on this phone/browser.</div>`)}
+function openModal(body){document.getElementById("sheet").innerHTML=body+`<div style="margin-top:14px"><button onclick="closeModal()">CLOSE</button></div>`;document.getElementById("modal").classList.remove("hidden")}
+function closeModal(){document.getElementById("modal").classList.add("hidden")}
+function resetSystem(){if(confirm("Reset all system progress?")){p=fresh();save();render()}}
+render();
+if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});
+</script>
+</body></html>

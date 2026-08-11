@@ -1,0 +1,10 @@
+{
+  "name": "Real-Life Leveling System",
+  "short_name": "System",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#050812",
+  "theme_color": "#070a14",
+  "description": "Solo-Leveling-style daily routine RPG for a Civil Engineering student.",
+  "icons": []
+}
