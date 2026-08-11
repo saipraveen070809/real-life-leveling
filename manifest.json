@@ -6,5 +6,14 @@
   "background_color": "#050812",
   "theme_color": "#070a14",
   "description": "Solo-Leveling-style daily routine RPG for a Civil Engineering student.",
-  "icons": []
+  "icons": [{
+    "src": "./icon-192.png",
+    "sizes": "192x192",
+    "type": "image/png"
+  },
+  {
+    "src": "./icon-512.png",
+    "sizes": "512x512",
+    "type": "image/png"
+  }k]
 }
