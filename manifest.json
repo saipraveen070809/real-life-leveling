@@ -1,6 +1,8 @@
 {
   "name": "Real-Life Leveling System",
   "short_name": "System",
+  "id": "./",
+"orientation": "portrait",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#050812",
